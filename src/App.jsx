@@ -75,8 +75,40 @@ function App() {
           id: 'webmodeler_database',
           label: 'Select database for Web Modeler',
           type: 'radio',
-          options: ['PostgreSQL', 'MySQL'],
+          options: ['PostgreSQL'],
           required: true
+        },
+        {
+          id: 'webmodeler_db_url',
+          label: 'Database URL',
+          type: 'text',
+          placeholder: 'your-postgres-host.example.com',
+          required: true,
+          showIf: (answers) => answers.webmodeler_database === 'PostgreSQL'
+        },
+        {
+          id: 'webmodeler_db_host',
+          label: 'Host',
+          type: 'text',
+          placeholder: 'your-postgres-host.example.com',
+          required: true,
+          showIf: (answers) => answers.webmodeler_database === 'PostgreSQL'
+        },
+        {
+          id: 'webmodeler_db_user',
+          label: 'User',
+          type: 'text',
+          placeholder: 'webmodeler-user',
+          required: true,
+          showIf: (answers) => answers.webmodeler_database === 'PostgreSQL'
+        },
+        {
+          id: 'webmodeler_db_password',
+          label: 'Password',
+          type: 'password',
+          placeholder: 'mypassword',
+          required: true,
+          showIf: (answers) => answers.webmodeler_database === 'PostgreSQL'
         }
       ]
     }
@@ -123,6 +155,51 @@ function App() {
     }
   }
 
+  // Generate YAML config
+  const generateYaml = () => {
+    const config = {}
+
+    // Zeebe config
+    if (answers.products?.includes('Zeebe Broker and Gateway (including: Operate & Tasklist)')) {
+      config.zeebe = {
+        database: answers.zeebe_database
+      }
+    }
+
+    // Optimize config
+    if (answers.products?.includes('Optimize')) {
+      config.optimize = {
+        database: answers.optimize_database
+      }
+    }
+
+    // Identity config
+    if (answers.products?.includes('Identity')) {
+      config.identity = {
+        database: answers.identity_database
+      }
+    }
+
+    // Web Modeler config
+    if (answers.products?.includes('Web Modeler')) {
+      config.webModeler = {
+        restapi: {
+          externalDatabase: {
+            enabled: true,
+            url: answers.webmodeler_db_url,
+            host: answers.webmodeler_db_host,
+            port: 5432,
+            database: "web-modeler",
+            user: answers.webmodeler_db_user,
+            password: answers.webmodeler_db_password
+          }
+        }
+      }
+    }
+
+    console.log(config)
+  }
+
   return (
     <main className="config-app">
       <header>
@@ -132,14 +209,19 @@ function App() {
       <section className="wizard-content">
         <h2>{currentStepData.title}</h2>
 
-        {currentStepData.questions.map(q => (
-          <QuestionRenderer
-            key={q.id}
-            question={q}
-            value={answers[q.id]}
-            onChange={(val) => saveAnswer(q.id, val)}
-          />
-        ))}
+        {currentStepData.questions.map(q => {
+          // Handle question level showIf
+          if (q.showIf && !q.showIf(answers)) return null
+
+          return (
+            <QuestionRenderer
+              key={q.id}
+              question={q}
+              value={answers[q.id]}
+              onChange={(val) => saveAnswer(q.id, val)}
+            />
+          )
+        })}
       </section>
 
       {/* Debug - see answers */}
@@ -149,7 +231,11 @@ function App() {
 
       <nav className='app-navigation'>
         <button className="nav-button back-button" onClick={previous}>Back</button>
-        <button className="nav-button next-button" onClick={next}>Next</button>
+
+        {page === totalPages
+          ? <button className="nav-button next-button" onClick={generateYaml}>Generate</button>
+          : <button className="nav-button next-button" onClick={next}>Next</button>
+        }
       </nav>
     </main>
   )
@@ -207,15 +293,18 @@ function QuestionRenderer({ question, value, onChange }) {
     )
   }
 
-  if (question.type === 'text') {
+  if (question.type === 'text' || question.type === 'password') {
     return (
       <div className="question-wrapper text-input">
         <label>{question.label}</label>
         <input
-          type="text"
+          type={question.type}
           value={value || ''}
+          placeholder={question.placeholder || ''}
           onChange={(e) => onChange(e.target.value)}
         />
+
+        
       </div>
     )
   }
