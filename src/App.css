@@ -5,7 +5,12 @@
 }
 
 
-
+.bread-crumb{
+  border-radius: 50px;
+  background-color: white;
+  color: black;
+  padding: 10px 25px;
+}
 
 
 .switch {
@@ -83,8 +88,9 @@ input:checked + .slider:before {
 }
 
 .config-app{
-    width: 100vw;
-    height: 200vh;
+    max-width: 100vw;
+    min-width: 100vh;
+    margin-top: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -94,21 +100,20 @@ input:checked + .slider:before {
 
 .app-navigation{
     position: fixed;
-    bottom: 0;
+    bottom: 50%;
     width: 100vw;
     display: flex;
     justify-content: space-between;
-    padding: 0 20px;
-    background: rgb(50, 50, 50);
-    padding: 20px 10px;
+    padding: 0 30px;
+    
 }
 
 
 .nav-button{
-    background-color: #000000; /* Green */
+    background-color: #ffffff; /* Green */
     border: none;
     border-radius: 20px;
-    color: white;
+    color: black;
     padding: 10px 24px;
     text-align: center;
     text-decoration: none;
@@ -210,4 +215,69 @@ input:checked + .slider:before {
 .text-input input:focus {
   outline: none;
   border-color: #007bff;
+}
+
+
+
+
+
+
+
+
+
+.generate-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 0.75rem 2rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.generate-button:hover {
+  background-color: #218838;
+}
+
+
+
+
+.output{
+  background-color: rgb(19, 19, 19);
+  border: 5px solid rgb(39, 39, 39);
+  color: orange;
+  width: 30%;
+  padding: 20px;
+  overflow-x: none;
+  overflow-y: auto;
+  min-height: 100px;
+  max-height: 200px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+}
+
+.output {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Scrollbar width */
+.output::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track (background area) */
+.output::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Scroll thumb (the draggable part) */
+.output::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+// import yaml from 'js-yaml';
 import './App.css'
 
 function App() {
@@ -35,6 +36,72 @@ function App() {
           type: 'radio',
           options: ['Elasticsearch', 'OpenSearch'],
           required: true
+        },
+        // Elasticsearch fields
+        {
+          id: 'zeebe_es_username',
+          label: 'Elasticsearch Username',
+          type: 'text',
+          placeholder: 'elastic',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
+        },
+        {
+          id: 'zeebe_es_protocol',
+          label: 'Protocol',
+          type: 'text',
+          placeholder: 'http',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
+        },
+        {
+          id: 'zeebe_es_password',
+          label: 'Password',
+          type: 'password',
+          placeholder: 'your-password',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
+        },
+        {
+          id: 'zeebe_es_host',
+          label: 'Host',
+          type: 'text',
+          placeholder: 'elasticsearch.example.com',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
+        },
+        // OpenSearch fields
+        {
+          id: 'zeebe_os_username',
+          label: 'OpenSearch Username',
+          type: 'text',
+          placeholder: 'elastic',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
+        },
+        {
+          id: 'zeebe_os_protocol',
+          label: 'Protocol',
+          type: 'text',
+          placeholder: 'https',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
+        },
+        {
+          id: 'zeebe_os_password',
+          label: 'Password',
+          type: 'password',
+          placeholder: 'your-os-password',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
+        },
+        {
+          id: 'zeebe_os_host',
+          label: 'Host',
+          type: 'text',
+          placeholder: 'your-os-cluster.example.com',
+          required: true,
+          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
         }
       ]
     },
@@ -49,6 +116,72 @@ function App() {
           type: 'radio',
           options: ['Elasticsearch', 'OpenSearch'],
           required: true
+        },
+        // Elasticsearch fields
+        {
+          id: 'optimize_es_username',
+          label: 'Elasticsearch Username',
+          type: 'text',
+          placeholder: 'elastic',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+        },
+        {
+          id: 'optimize_es_protocol',
+          label: 'Protocol',
+          type: 'text',
+          placeholder: 'http',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+        },
+        {
+          id: 'optimize_es_password',
+          label: 'Password',
+          type: 'password',
+          placeholder: 'your-password',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+        },
+        {
+          id: 'optimize_es_host',
+          label: 'Host',
+          type: 'text',
+          placeholder: 'elasticsearch.example.com',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+        },
+        // OpenSearch fields
+        {
+          id: 'optimize_os_username',
+          label: 'OpenSearch Username',
+          type: 'text',
+          placeholder: 'elastic',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'OpenSearch'
+        },
+        {
+          id: 'optimize_os_protocol',
+          label: 'Protocol',
+          type: 'text',
+          placeholder: 'https',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'OpenSearch'
+        },
+        {
+          id: 'optimize_os_password',
+          label: 'Password',
+          type: 'password',
+          placeholder: 'your-os-password',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'OpenSearch'
+        },
+        {
+          id: 'optimize_os_host',
+          label: 'Host',
+          type: 'text',
+          placeholder: 'your-os-cluster.example.com',
+          required: true,
+          showIf: (answers) => answers.optimize_database === 'OpenSearch'
         }
       ]
     },
@@ -117,6 +250,7 @@ function App() {
   // States
   const [page, setPage] = useState(1)
   const [answers, setAnswers] = useState({})
+  const [yamlOutput, setYamlOutput] = useState('')
 
   // Filter visible steps based on answers
   const visibleSteps = wizardSteps.filter(step => {
@@ -136,7 +270,6 @@ function App() {
       [questionId]: value
     })
 
-    // Reset to step 1 when products change
     if (questionId === 'products') {
       setPage(1)
     }
@@ -157,52 +290,59 @@ function App() {
 
   // Generate YAML config
   const generateYaml = () => {
-    const config = {}
+  let config = ''
 
-    // Zeebe config
-    if (answers.products?.includes('Zeebe Broker and Gateway (including: Operate & Tasklist)')) {
-      config.zeebe = {
-        database: answers.zeebe_database
-      }
-    }
-
-    // Optimize config
-    if (answers.products?.includes('Optimize')) {
-      config.optimize = {
-        database: answers.optimize_database
-      }
-    }
-
-    // Identity config
-    if (answers.products?.includes('Identity')) {
-      config.identity = {
-        database: answers.identity_database
-      }
-    }
-
-    // Web Modeler config
-    if (answers.products?.includes('Web Modeler')) {
-      config.webModeler = {
-        restapi: {
-          externalDatabase: {
-            enabled: true,
-            url: answers.webmodeler_db_url,
-            host: answers.webmodeler_db_host,
-            port: 5432,
-            database: "web-modeler",
-            user: answers.webmodeler_db_user,
-            password: answers.webmodeler_db_password
-          }
-        }
-      }
-    }
-
-    console.log(config)
+  if (answers.zeebe_database === 'Elasticsearch') {
+    config += `global:
+  elasticsearch:
+    enabled: true
+    external: true
+    auth:
+      username: "${answers.zeebe_es_username}"
+      secret:
+        password: "${answers.zeebe_es_password}"
+    url:
+      protocol: "${answers.zeebe_es_protocol}"
+      host: "${answers.zeebe_es_host}"
+      port: 9200
+    clusterName: "elasticsearch"\n`
   }
+
+  if (answers.zeebe_database === 'OpenSearch') {
+    config += `global:
+  opensearch:
+    enabled: true
+    external: true
+    auth:
+      username: "${answers.zeebe_os_username}"
+      secret:
+        password: "${answers.zeebe_os_password}"
+    url:
+      protocol: "${answers.zeebe_os_protocol}"
+      host: "${answers.zeebe_os_host}"
+      port: 9200
+    clusterName: "opensearch"\n`
+  }
+
+  if (answers.products?.includes('Web Modeler')) {
+    config += `webModeler:
+  restapi:
+    externalDatabase:
+      enabled: true
+      url: "jdbc:postgresql://${answers.webmodeler_db_url}:5432/web-modeler"
+      host: "${answers.webmodeler_db_host}"
+      port: 5432
+      database: "web-modeler"
+      user: "${answers.webmodeler_db_user}"
+      password: "${answers.webmodeler_db_password}"\n`
+  }
+
+  setYamlOutput(config)
+}
 
   return (
     <main className="config-app">
-      <header>
+      <header className='bread-crumb'>
         <p>Step {page} Of {totalPages}</p>
       </header>
 
@@ -210,7 +350,6 @@ function App() {
         <h2>{currentStepData.title}</h2>
 
         {currentStepData.questions.map(q => {
-          // Handle question level showIf
           if (q.showIf && !q.showIf(answers)) return null
 
           return (
@@ -224,19 +363,18 @@ function App() {
         })}
       </section>
 
-      {/* Debug - see answers */}
-      <section>
-        <pre>{JSON.stringify(answers, null, 2)}</pre>
-      </section>
+      {/* YAML Output */}
+      <div className='output'>
+        <pre>{yamlOutput || 'Config will appear here...'}</pre>
+      </div>
 
       <nav className='app-navigation'>
         <button className="nav-button back-button" onClick={previous}>Back</button>
-
-        {page === totalPages
-          ? <button className="nav-button next-button" onClick={generateYaml}>Generate</button>
-          : <button className="nav-button next-button" onClick={next}>Next</button>
-        }
+        <button className="nav-button next-button" onClick={next} disabled={page === totalPages}>Next</button>
       </nav>
+
+      {/* Generate button - always visible fixed bottom right */}
+      <button className="generate-button" onClick={generateYaml}>Generate</button>
     </main>
   )
 }
@@ -303,11 +441,9 @@ function QuestionRenderer({ question, value, onChange }) {
           placeholder={question.placeholder || ''}
           onChange={(e) => onChange(e.target.value)}
         />
-
-        
       </div>
     )
   }
 }
 
-export default App
+export default App;
