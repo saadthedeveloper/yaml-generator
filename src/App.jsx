@@ -1,5 +1,4 @@
 import { useState } from 'react';
-// import yaml from 'js-yaml';
 import './App.css'
 
 function App() {
@@ -194,7 +193,7 @@ function App() {
           id: 'identity_database',
           label: 'Select database for Identity',
           type: 'radio',
-          options: ['PostgreSQL', 'MySQL'],
+          options: ['PostgreSQL'],
           required: true
         }
       ]
@@ -206,7 +205,7 @@ function App() {
       questions: [
         {
           id: 'webmodeler_database',
-          label: 'Select database for Web Modeler',
+          label: 'Select database for Web Modeler (only for REST API)',
           type: 'radio',
           options: ['PostgreSQL'],
           required: true
@@ -242,6 +241,89 @@ function App() {
           placeholder: 'mypassword',
           required: true,
           showIf: (answers) => answers.webmodeler_database === 'PostgreSQL'
+        }
+      ]
+    },
+    // Environment Variables Steps
+    {
+      stepNumber: 6,
+      title: "Zeebe Environment Variables",
+      showIf: (answers) => answers.products?.includes('Zeebe Broker and Gateway (including: Operate & Tasklist)'),
+      questions: [
+        {
+          id: 'zeebe_env_vars',
+          label: 'Add environment variables for Zeebe (optional)',
+          type: 'env_vars'
+        }
+      ]
+    },
+    {
+      stepNumber: 7,
+      title: "Connectors Environment Variables",
+      showIf: (answers) => answers.products?.includes('Connectors'),
+      questions: [
+        {
+          id: 'connectors_env_vars',
+          label: 'Add environment variables for Connectors (optional)',
+          type: 'env_vars'
+        }
+      ]
+    },
+    {
+      stepNumber: 8,
+      title: "Optimize Environment Variables",
+      showIf: (answers) => answers.products?.includes('Optimize'),
+      questions: [
+        {
+          id: 'optimize_env_vars',
+          label: 'Add environment variables for Optimize (optional)',
+          type: 'env_vars'
+        }
+      ]
+    },
+    {
+      stepNumber: 9,
+      title: "Identity Environment Variables",
+      showIf: (answers) => answers.products?.includes('Identity'),
+      questions: [
+        {
+          id: 'identity_env_vars',
+          label: 'Add environment variables for Identity (optional)',
+          type: 'env_vars'
+        }
+      ]
+    },
+    {
+      stepNumber: 10,
+      title: "Web Modeler Environment Variables",
+      showIf: (answers) => answers.products?.includes('Web Modeler'),
+      questions: [
+        {
+          id: 'webmodeler_restapi_env_vars',
+          label: 'REST API Environment Variables (optional)',
+          type: 'env_vars'
+        },
+        {
+          id: 'webmodeler_webapp_env_vars',
+          label: 'Web App Environment Variables (optional)',
+          type: 'env_vars'
+        },
+        {
+          id: 'webmodeler_websocket_env_vars',
+          label: 'WebSocket Environment Variables (optional)',
+          type: 'env_vars'
+        }
+      ]
+    },
+    {
+      stepNumber: 11,
+      title: "Console Environment Variables",
+      showIf: (answers) => answers.products?.includes('Console'),
+      questions: [
+        {
+          id: 'console_env_vars',
+          label: 'Add environment variables for Console (optional)',
+          type: 'env_vars'
         }
       ]
     }
@@ -292,6 +374,7 @@ function App() {
   const generateYaml = () => {
   let config = ''
 
+  // Database configs (Elasticsearch/OpenSearch)
   if (answers.zeebe_database === 'Elasticsearch') {
     config += `global:
   elasticsearch:
@@ -305,7 +388,7 @@ function App() {
       protocol: "${answers.zeebe_es_protocol}"
       host: "${answers.zeebe_es_host}"
       port: 9200
-    clusterName: "elasticsearch"\n`
+    clusterName: "elasticsearch"\n\n`
   }
 
   if (answers.zeebe_database === 'OpenSearch') {
@@ -321,10 +404,11 @@ function App() {
       protocol: "${answers.zeebe_os_protocol}"
       host: "${answers.zeebe_os_host}"
       port: 9200
-    clusterName: "opensearch"\n`
+    clusterName: "opensearch"\n\n`
   }
 
-  if (answers.products?.includes('Web Modeler')) {
+  // Web Modeler Database
+  if (answers.products?.includes('Web Modeler') && answers.webmodeler_database === 'PostgreSQL') {
     config += `webModeler:
   restapi:
     externalDatabase:
@@ -334,10 +418,91 @@ function App() {
       port: 5432
       database: "web-modeler"
       user: "${answers.webmodeler_db_user}"
-      password: "${answers.webmodeler_db_password}"\n`
+      password: "${answers.webmodeler_db_password}"\n\n`
   }
 
-  setYamlOutput(config)
+  // Console environment variables
+  if (answers.console_env_vars && answers.console_env_vars.length > 0) {
+    config += `console:\n  env:\n`
+    answers.console_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  // Connectors environment variables
+  if (answers.connectors_env_vars && answers.connectors_env_vars.length > 0) {
+    config += `connectors:\n  env:\n`
+    answers.connectors_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  // Orchestration (Zeebe) environment variables
+  if (answers.zeebe_env_vars && answers.zeebe_env_vars.length > 0) {
+    config += `orchestration:\n  env:\n`
+    answers.zeebe_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  // Optimize environment variables
+  if (answers.optimize_env_vars && answers.optimize_env_vars.length > 0) {
+    config += `optimize:\n  env:\n`
+    answers.optimize_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  // Identity environment variables
+  if (answers.identity_env_vars && answers.identity_env_vars.length > 0) {
+    config += `identity:\n  env:\n`
+    answers.identity_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  // Web Modeler environment variables (3 sections)
+  let webModelerEnvAdded = false
+
+  if (answers.webmodeler_restapi_env_vars && answers.webmodeler_restapi_env_vars.length > 0) {
+    if (!webModelerEnvAdded) {
+      config += `webModeler:\n`
+      webModelerEnvAdded = true
+    }
+    config += `  restApi:\n    env:\n`
+    answers.webmodeler_restapi_env_vars.forEach(env => {
+      config += `      - name: ${env.name}\n        value: ${env.value}\n`
+    })
+  }
+
+  if (answers.webmodeler_webapp_env_vars && answers.webmodeler_webapp_env_vars.length > 0) {
+    if (!webModelerEnvAdded) {
+      config += `webModeler:\n`
+      webModelerEnvAdded = true
+    }
+    config += `  webApp:\n    env:\n`
+    answers.webmodeler_webapp_env_vars.forEach(env => {
+      config += `      - name: ${env.name}\n        value: ${env.value}\n`
+    })
+  }
+
+  if (answers.webmodeler_websocket_env_vars && answers.webmodeler_websocket_env_vars.length > 0) {
+    if (!webModelerEnvAdded) {
+      config += `webModeler:\n`
+      webModelerEnvAdded = true
+    }
+    config += `  websocket:\n    env:\n`
+    answers.webmodeler_websocket_env_vars.forEach(env => {
+      config += `      - name: ${env.name}\n        value: ${env.value}\n`
+    })
+  }
+
+  setYamlOutput(config || 'No configuration generated yet...')
 }
 
   return (
@@ -369,8 +534,12 @@ function App() {
       </div>
 
       <nav className='app-navigation'>
-        <button className="nav-button back-button" onClick={previous}>Back</button>
-        <button className="nav-button next-button" onClick={next} disabled={page === totalPages}>Next</button>
+        <button className="nav-button back-button" onClick={previous}>
+          <i className="fa-solid fa-arrow-left arrow"></i>Back
+        </button>
+        <button className="nav-button next-button" onClick={next} disabled={page === totalPages}>
+          Next<i className="fa-solid fa-arrow-right"></i>
+        </button>
       </nav>
 
       {/* Generate button - always visible fixed bottom right */}
@@ -379,7 +548,97 @@ function App() {
   )
 }
 
-// Question Renderer Component (outside App)
+// Environment Variables Manager Component
+function EnvironmentVariablesManager({ productId, value, onChange }) {
+  const [envVars, setEnvVars] = useState(value || [])
+  const [editingIndex, setEditingIndex] = useState(null)
+  const [currentName, setCurrentName] = useState('')
+  const [currentValue, setCurrentValue] = useState('')
+
+  const handleAdd = () => {
+    if (!currentName || !currentValue) return
+
+    const newEnvVars = [...envVars, { name: currentName, value: currentValue }]
+    setEnvVars(newEnvVars)
+    onChange(newEnvVars)
+    setCurrentName('')
+    setCurrentValue('')
+  }
+
+  const handleEdit = (index) => {
+    setEditingIndex(index)
+    setCurrentName(envVars[index].name)
+    setCurrentValue(envVars[index].value)
+  }
+
+  const handleUpdate = () => {
+    if (editingIndex === null) return
+
+    const newEnvVars = [...envVars]
+    newEnvVars[editingIndex] = { name: currentName, value: currentValue }
+    setEnvVars(newEnvVars)
+    onChange(newEnvVars)
+    setEditingIndex(null)
+    setCurrentName('')
+    setCurrentValue('')
+  }
+
+  const handleDelete = (index) => {
+    const newEnvVars = envVars.filter((_, i) => i !== index)
+    setEnvVars(newEnvVars)
+    onChange(newEnvVars)
+  }
+
+  const handleNew = () => {
+    setEditingIndex(null)
+    setCurrentName('')
+    setCurrentValue('')
+  }
+
+  return (
+    <div className="env-vars-manager">
+      {/* List of existing env vars */}
+      <div className="env-vars-list">
+        {envVars.map((env, index) => (
+          <div key={index} className="env-var-item">
+            <span><strong>{env.name}</strong> = {env.value}</span>
+            <div className="env-var-actions">
+              <button onClick={() => handleEdit(index)} className="edit-btn">Edit</button>
+              <button onClick={() => handleDelete(index)} className="delete-btn">Delete</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Add/Edit form */}
+      <div className="env-var-form">
+        <input
+          type="text"
+          placeholder="Name"
+          value={currentName}
+          onChange={(e) => setCurrentName(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Value"
+          value={currentValue}
+          onChange={(e) => setCurrentValue(e.target.value)}
+        />
+
+        <div className="env-form-buttons">
+          {editingIndex === null ? (
+            <button onClick={handleAdd} className="done-btn">Done</button>
+          ) : (
+            <button onClick={handleUpdate} className="update-btn">Update</button>
+          )}
+          <button onClick={handleNew} className="new-btn">New</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Question Renderer Component
 function QuestionRenderer({ question, value, onChange }) {
   if (question.type === 'radio') {
     return (
@@ -440,6 +699,19 @@ function QuestionRenderer({ question, value, onChange }) {
           value={value || ''}
           placeholder={question.placeholder || ''}
           onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+    )
+  }
+
+  if (question.type === 'env_vars') {
+    return (
+      <div className="question-wrapper">
+        <label>{question.label}</label>
+        <EnvironmentVariablesManager
+          productId={question.id}
+          value={value}
+          onChange={onChange}
         />
       </div>
     )
