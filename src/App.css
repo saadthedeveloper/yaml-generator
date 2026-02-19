@@ -1,3 +1,6 @@
+/* =====================
+   RESET
+   ===================== */
 * {
   margin: 0;
   padding: 0;
@@ -5,89 +8,9 @@
 }
 
 
-.bread-crumb {
-  border-radius: 50px;
-  background-color: white;
-  color: black;
-  padding: 10px 25px;
-  font-weight: 700;
-
-}
-
-
-.switch {
-  display: inline-block;
-  height: 34px;
-  position: relative;
-  width: 60px;
-}
-
-.switch input {
-  display: none;
-}
-
-.slider {
-  background-color: #ccc;
-  bottom: 0;
-  cursor: pointer;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transition: .4s;
-}
-
-.slider:before {
-  background-color: #fff;
-  bottom: 4px;
-  content: "";
-  height: 26px;
-  left: 4px;
-  position: absolute;
-  transition: .4s;
-  width: 26px;
-}
-
-input:checked+.slider {
-  background-color: #66bb6a;
-}
-
-input:checked+.slider:before {
-  transform: translateX(26px);
-}
-
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-
-
-
-
-
-
-.question-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-.answer-buttons {
-  width: 20%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
+/* =====================
+   APP LAYOUT
+   ===================== */
 .config-app {
   max-width: 100vw;
   min-width: 100vh;
@@ -99,44 +22,22 @@ input:checked+.slider:before {
   gap: 20px;
 }
 
-.app-navigation {
-  position: fixed;
-  bottom: 50%;
-  width: 100vw;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 30px;
 
-}
-
-
-.nav-button {
-  background-color: #ffffff;
-  /* Green */
-  border: none;
-  border-radius: 20px;
+/* =====================
+   BREADCRUMB / STEP INDICATOR
+   ===================== */
+.bread-crumb {
+  border-radius: 50px;
+  background-color: white;
   color: black;
-  padding: 10px 24px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  gap: 10px;
+  padding: 10px 25px;
   font-weight: 700;
-  align-items: center;
 }
 
 
-
-
-
-
-
-/* App.css */
-
-/* Question container */
+/* =====================
+   WIZARD STEP CONTENT
+   ===================== */
 .wizard-content {
   flex: 1;
   display: flex;
@@ -149,7 +50,10 @@ input:checked+.slider:before {
   text-align: center;
 }
 
-/* Individual question wrapper */
+
+/* =====================
+   QUESTION RENDERER
+   ===================== */
 .question-wrapper {
   margin-bottom: 2rem;
 }
@@ -161,7 +65,7 @@ input:checked+.slider:before {
   font-size: 1.1rem;
 }
 
-/* Radio buttons */
+/* Radio */
 .radio-group label {
   display: flex;
   align-items: center;
@@ -184,7 +88,7 @@ input:checked+.slider:before {
   cursor: pointer;
 }
 
-/* Checkboxes */
+/* Checkbox */
 .checkbox-group label {
   display: flex;
   align-items: center;
@@ -207,7 +111,7 @@ input:checked+.slider:before {
   cursor: pointer;
 }
 
-/* Text inputs */
+/* Text / Password */
 .text-input input {
   width: 100%;
   padding: 0.75rem;
@@ -222,75 +126,11 @@ input:checked+.slider:before {
 }
 
 
+/* =====================
+   ENVIRONMENT VARIABLES MANAGER
+   ===================== */
 
-
-
-
-
-
-
-.generate-button {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  padding: 0.75rem 2rem;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.generate-button:hover {
-  background-color: #218838;
-}
-
-
-
-
-.output {
-  background-color: rgb(19, 19, 19);
-  border: 5px solid rgb(39, 39, 39);
-  color: orange;
-  width: 30%;
-  padding: 20px;
-  overflow-x: none;
-  overflow-y: auto;
-  min-height: 100px;
-  max-height: 200px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  display: flex;
-}
-
-.output {
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* Scrollbar width */
-.output::-webkit-scrollbar {
-  width: 8px;
-}
-
-/* Track (background area) */
-.output::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Scroll thumb (the draggable part) */
-.output::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-
-
-
-/*env variables*/
-
+/* Layout */
 .env-vars-manager {
   margin-top: 1rem;
 }
@@ -314,6 +154,7 @@ input:checked+.slider:before {
   gap: 0.5rem;
 }
 
+/* List item buttons */
 .edit-btn, .delete-btn {
   padding: 0.4rem 0.8rem;
   font-size: 0.85rem;
@@ -332,6 +173,7 @@ input:checked+.slider:before {
   color: white;
 }
 
+/* Add/Edit form */
 .env-var-form {
   display: flex;
   flex-direction: column;
@@ -353,6 +195,7 @@ input:checked+.slider:before {
   gap: 0.5rem;
 }
 
+/* Form buttons */
 .done-btn, .update-btn, .new-btn {
   flex: 1;
   padding: 0.75rem;
@@ -375,4 +218,88 @@ input:checked+.slider:before {
 .new-btn {
   background: #6c757d;
   color: white;
+}
+
+
+/* =====================
+   NAVIGATION
+   ===================== */
+.app-navigation {
+  position: fixed;
+  bottom: 50%;
+  width: 100vw;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.nav-button {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  color: black;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  font-weight: 700;
+  align-items: center;
+}
+
+
+/* =====================
+   GENERATE BUTTON
+   ===================== */
+.generate-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 0.75rem 2rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.generate-button:hover {
+  background-color: #218838;
+}
+
+
+/* =====================
+   YAML OUTPUT CONSOLE
+   ===================== */
+.output {
+  background-color: rgb(19, 19, 19);
+  border: 5px solid rgb(39, 39, 39);
+  color: orange;
+  width: 30%;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100px;
+  max-height: 200px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+}
+
+.output::-webkit-scrollbar {
+  width: 8px;
+}
+
+.output::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.output::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
 }
