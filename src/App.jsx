@@ -3,22 +3,25 @@ import './App.css'
 
 function App() {
 
-  // ─── WIZARD STEPS CONFIG ──────────────────────────────────────────────────
-  // This array defines every step (page) in the wizard.
-  // Each step has:
-  //   - stepNumber: used for reference
-  //   - title: displayed as the heading on that page
-  //   - showIf: optional function — if it returns false, the step is skipped entirely
-  //   - questions: array of question objects to render on that step
+  // ==============================================================================
+  // WIZARD CONFIGURATION
+  // ==============================================================================
+  // This is the heart of the wizard - it defines every possible step and question.
+  // Think of it as a blueprint that tells the wizard what to show and when.
   //
-  // Each question has:
-  //   - id: unique key used to store the answer in state
-  //   - label: the text shown above the input
-  //   - type: determines which input to render ('radio', 'checkbox', 'text', 'password', 'env_vars')
-  //   - options: array of choices (for radio/checkbox types)
-  //   - placeholder: hint text inside text inputs
-  //   - required: whether the field must be filled (not enforced yet, just flagged)
-  //   - showIf: optional function — if it returns false, this individual question is hidden
+  // How it works:
+  // - Each step is an object with questions inside it
+  // - Some steps have a 'showIf' function - these only appear if the condition is met
+  //   (like showing database config only if the user selected that product)
+  // - Questions can also have their own 'showIf' to conditionally appear within a step
+  //   (like showing Elasticsearch fields only after selecting Elasticsearch)
+  //
+  // Question types we support:
+  // - 'checkbox': multiple selections (product list)
+  // - 'radio': single selection (database choice)
+  // - 'text': regular text input (username, host)
+  // - 'password': hidden text input (passwords)
+  // - 'env_vars': special component for managing environment variables
 
   const wizardSteps = [
     {
@@ -30,10 +33,10 @@ function App() {
           label: 'Select the products you need:',
           type: 'checkbox',
           options: [
-            'Zeebe Broker and Gateway (including: Operate & Tasklist)',
+            'Orchestration Cluster',
             'Connectors',
             'Optimize',
-            'Identity',
+            'Management Identity',
             'Web Modeler',
             'Console'
           ],
@@ -42,174 +45,247 @@ function App() {
       ]
     },
     {
-      stepNumber: 2,
-      title: "Zeebe Database Configuration",
-      // Only show this step if the user selected Zeebe in step 1
-      showIf: (answers) => answers.products?.includes('Zeebe Broker and Gateway (including: Operate & Tasklist)'),
-      questions: [
-        {
-          id: 'zeebe_database',
-          label: 'Select database for Zeebe Broker & Gateway',
-          type: 'radio',
-          options: ['Elasticsearch', 'OpenSearch'],
-          required: true
-        },
-        // --- Elasticsearch fields (only shown if Elasticsearch is selected) ---
-        {
-          id: 'zeebe_es_username',
-          label: 'Elasticsearch Username',
-          type: 'text',
-          placeholder: 'elastic',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
-        },
-        {
-          id: 'zeebe_es_protocol',
-          label: 'Protocol',
-          type: 'text',
-          placeholder: 'http',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
-        },
-        {
-          id: 'zeebe_es_password',
-          label: 'Password',
-          type: 'password',
-          placeholder: 'your-password',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
-        },
-        {
-          id: 'zeebe_es_host',
-          label: 'Host',
-          type: 'text',
-          placeholder: 'elasticsearch.example.com',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'Elasticsearch'
-        },
-        // --- OpenSearch fields (only shown if OpenSearch is selected) ---
-        {
-          id: 'zeebe_os_username',
-          label: 'OpenSearch Username',
-          type: 'text',
-          placeholder: 'elastic',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
-        },
-        {
-          id: 'zeebe_os_protocol',
-          label: 'Protocol',
-          type: 'text',
-          placeholder: 'https',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
-        },
-        {
-          id: 'zeebe_os_password',
-          label: 'Password',
-          type: 'password',
-          placeholder: 'your-os-password',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
-        },
-        {
-          id: 'zeebe_os_host',
-          label: 'Host',
-          type: 'text',
-          placeholder: 'your-os-cluster.example.com',
-          required: true,
-          showIf: (answers) => answers.zeebe_database === 'OpenSearch'
-        }
-      ]
+  stepNumber: 2,
+  title: "Orchestration Cluster Database Configuration",
+  showIf: (answers) => answers.products?.includes('Orchestration Cluster') && !answers.products?.includes('Optimize'),
+  questions: [
+    {
+      id: 'orchestration_cluster_database',
+      label: 'Select database for Orchestration Cluster',
+      type: 'radio',
+      options: ['Elasticsearch', 'OpenSearch'],
+      required: true
     },
     {
-      stepNumber: 3,
-      title: "Optimize Database Configuration",
-      showIf: (answers) => answers.products?.includes('Optimize'),
-      questions: [
-        {
-          id: 'optimize_database',
-          label: 'Select database for Optimize',
-          type: 'radio',
-          options: ['Elasticsearch', 'OpenSearch'],
-          required: true
-        },
-        // --- Elasticsearch fields ---
-        {
-          id: 'optimize_es_username',
-          label: 'Elasticsearch Username',
-          type: 'text',
-          placeholder: 'elastic',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
-        },
-        {
-          id: 'optimize_es_protocol',
-          label: 'Protocol',
-          type: 'text',
-          placeholder: 'http',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
-        },
-        {
-          id: 'optimize_es_password',
-          label: 'Password',
-          type: 'password',
-          placeholder: 'your-password',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
-        },
-        {
-          id: 'optimize_es_host',
-          label: 'Host',
-          type: 'text',
-          placeholder: 'elasticsearch.example.com',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'Elasticsearch'
-        },
-        // --- OpenSearch fields ---
-        {
-          id: 'optimize_os_username',
-          label: 'OpenSearch Username',
-          type: 'text',
-          placeholder: 'elastic',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'OpenSearch'
-        },
-        {
-          id: 'optimize_os_protocol',
-          label: 'Protocol',
-          type: 'text',
-          placeholder: 'https',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'OpenSearch'
-        },
-        {
-          id: 'optimize_os_password',
-          label: 'Password',
-          type: 'password',
-          placeholder: 'your-os-password',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'OpenSearch'
-        },
-        {
-          id: 'optimize_os_host',
-          label: 'Host',
-          type: 'text',
-          placeholder: 'your-os-cluster.example.com',
-          required: true,
-          showIf: (answers) => answers.optimize_database === 'OpenSearch'
-        }
-      ]
+      id: 'orchestration_cluster_es_username',
+      label: 'Elasticsearch Username',
+      type: 'text',
+      placeholder: 'elastic',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'Elasticsearch'
     },
+    {
+      id: 'orchestration_cluster_es_protocol',
+      label: 'Protocol',
+      type: 'text',
+      placeholder: 'http',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'Elasticsearch'
+    },
+    {
+      id: 'orchestration_cluster_es_password',
+      label: 'Password',
+      type: 'password',
+      placeholder: 'your-password',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'Elasticsearch'
+    },
+    {
+      id: 'orchestration_cluster_es_host',
+      label: 'Host',
+      type: 'text',
+      placeholder: 'elasticsearch.example.com',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'Elasticsearch'
+    },
+    {
+      id: 'orchestration_cluster_os_username',
+      label: 'OpenSearch Username',
+      type: 'text',
+      placeholder: 'elastic',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'OpenSearch'
+    },
+    {
+      id: 'orchestration_cluster_os_protocol',
+      label: 'Protocol',
+      type: 'text',
+      placeholder: 'https',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'OpenSearch'
+    },
+    {
+      id: 'orchestration_cluster_os_password',
+      label: 'Password',
+      type: 'password',
+      placeholder: 'your-os-password',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'OpenSearch'
+    },
+    {
+      id: 'orchestration_cluster_os_host',
+      label: 'Host',
+      type: 'text',
+      placeholder: 'your-os-cluster.example.com',
+      required: true,
+      showIf: (answers) => answers.orchestration_cluster_database === 'OpenSearch'
+    }
+  ]
+},
+{
+  stepNumber: 3,
+  title: "Optimize Database Configuration",
+  showIf: (answers) => answers.products?.includes('Optimize') && !answers.products?.includes('Orchestration Cluster'),
+  questions: [
+    {
+      id: 'optimize_database',
+      label: 'Select database for Optimize',
+      type: 'radio',
+      options: ['Elasticsearch', 'OpenSearch'],
+      required: true
+    },
+    {
+      id: 'optimize_es_username',
+      label: 'Elasticsearch Username',
+      type: 'text',
+      placeholder: 'elastic',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+    },
+    {
+      id: 'optimize_es_protocol',
+      label: 'Protocol',
+      type: 'text',
+      placeholder: 'http',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+    },
+    {
+      id: 'optimize_es_password',
+      label: 'Password',
+      type: 'password',
+      placeholder: 'your-password',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+    },
+    {
+      id: 'optimize_es_host',
+      label: 'Host',
+      type: 'text',
+      placeholder: 'elasticsearch.example.com',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'Elasticsearch'
+    },
+    {
+      id: 'optimize_os_username',
+      label: 'OpenSearch Username',
+      type: 'text',
+      placeholder: 'elastic',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'OpenSearch'
+    },
+    {
+      id: 'optimize_os_protocol',
+      label: 'Protocol',
+      type: 'text',
+      placeholder: 'https',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'OpenSearch'
+    },
+    {
+      id: 'optimize_os_password',
+      label: 'Password',
+      type: 'password',
+      placeholder: 'your-os-password',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'OpenSearch'
+    },
+    {
+      id: 'optimize_os_host',
+      label: 'Host',
+      type: 'text',
+      placeholder: 'your-os-cluster.example.com',
+      required: true,
+      showIf: (answers) => answers.optimize_database === 'OpenSearch'
+    }
+  ]
+},
+{
+  stepNumber: 3.5,
+  title: "Shared Search Database Configuration",
+  showIf: (answers) => answers.products?.includes('Orchestration Cluster') && answers.products?.includes('Optimize'),
+  questions: [
+    {
+      id: 'shared_database',
+      label: 'Select shared database for Orchestration Cluster and Optimize',
+      type: 'radio',
+      options: ['Elasticsearch', 'OpenSearch'],
+      required: true
+    },
+    {
+      id: 'shared_es_username',
+      label: 'Elasticsearch Username',
+      type: 'text',
+      placeholder: 'elastic',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'Elasticsearch'
+    },
+    {
+      id: 'shared_es_protocol',
+      label: 'Protocol',
+      type: 'text',
+      placeholder: 'http',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'Elasticsearch'
+    },
+    {
+      id: 'shared_es_password',
+      label: 'Password',
+      type: 'password',
+      placeholder: 'your-password',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'Elasticsearch'
+    },
+    {
+      id: 'shared_es_host',
+      label: 'Host',
+      type: 'text',
+      placeholder: 'elasticsearch.example.com',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'Elasticsearch'
+    },
+    {
+      id: 'shared_os_username',
+      label: 'OpenSearch Username',
+      type: 'text',
+      placeholder: 'elastic',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'OpenSearch'
+    },
+    {
+      id: 'shared_os_protocol',
+      label: 'Protocol',
+      type: 'text',
+      placeholder: 'https',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'OpenSearch'
+    },
+    {
+      id: 'shared_os_password',
+      label: 'Password',
+      type: 'password',
+      placeholder: 'your-os-password',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'OpenSearch'
+    },
+    {
+      id: 'shared_os_host',
+      label: 'Host',
+      type: 'text',
+      placeholder: 'your-os-cluster.example.com',
+      required: true,
+      showIf: (answers) => answers.shared_database === 'OpenSearch'
+    }
+  ]
+},
     {
       stepNumber: 4,
-      title: "Identity Database Configuration",
-      showIf: (answers) => answers.products?.includes('Identity'),
+      title: "Management Identity Database Configuration",
+      showIf: (answers) => answers.products?.includes('Management Identity'),
       questions: [
         {
-          id: 'identity_database',
-          label: 'Select database for Identity',
+          id: 'management_identity_database',
+          label: 'Select database for Management Identity',
           type: 'radio',
           options: ['PostgreSQL'],
           required: true
@@ -228,7 +304,8 @@ function App() {
           options: ['PostgreSQL'],
           required: true
         },
-        // These fields only appear once PostgreSQL is selected above
+        
+        // PostgreSQL connection details - shown after selecting PostgreSQL
         {
           id: 'webmodeler_db_url',
           label: 'Database URL',
@@ -264,19 +341,22 @@ function App() {
       ]
     },
 
-    // ─── ENVIRONMENT VARIABLE STEPS ─────────────────────────────────────────
-    // One step per product, each using the custom 'env_vars' question type
-    // which renders the EnvironmentVariablesManager component.
-    // These steps are all optional — users can skip them without adding anything.
+    // ==============================================================================
+    // ENVIRONMENT VARIABLES SECTION
+    // ==============================================================================
+    // Each product gets its own step for optional environment variables.
+    // Users can add as many name/value pairs as they need, or skip entirely.
+    // Web Modeler is special - it has three sub-services (restApi, webApp, websocket)
+    // so we ask for env vars separately for each.
 
     {
       stepNumber: 6,
-      title: "Zeebe Environment Variables",
-      showIf: (answers) => answers.products?.includes('Zeebe Broker and Gateway (including: Operate & Tasklist)'),
+      title: "Orchestration Cluster Environment Variables",
+      showIf: (answers) => answers.products?.includes('Orchestration Cluster'),
       questions: [
         {
-          id: 'zeebe_env_vars',
-          label: 'Add environment variables for Zeebe (optional)',
+          id: 'orchestration_cluster_env_vars',
+          label: 'Add environment variables for Orchestration Cluster (optional)',
           type: 'env_vars'
         }
       ]
@@ -307,12 +387,12 @@ function App() {
     },
     {
       stepNumber: 9,
-      title: "Identity Environment Variables",
-      showIf: (answers) => answers.products?.includes('Identity'),
+      title: "Management Identity Environment Variables",
+      showIf: (answers) => answers.products?.includes('Management Identity'),
       questions: [
         {
-          id: 'identity_env_vars',
-          label: 'Add environment variables for Identity (optional)',
+          id: 'management_identity_env_vars',
+          label: 'Add environment variables for Management Identity (optional)',
           type: 'env_vars'
         }
       ]
@@ -321,7 +401,7 @@ function App() {
       stepNumber: 10,
       title: "Web Modeler Environment Variables",
       showIf: (answers) => answers.products?.includes('Web Modeler'),
-      // Web Modeler has three separate services, each with their own env vars
+      // Web Modeler consists of three separate services, each can have its own env vars
       questions: [
         {
           id: 'webmodeler_restapi_env_vars',
@@ -355,55 +435,75 @@ function App() {
   ]
 
 
-  // ─── STATE ────────────────────────────────────────────────────────────────
-  // useState returns [currentValue, setterFunction].
-  // Calling the setter causes React to re-render the component with the new value.
+  // ==============================================================================
+  // COMPONENT STATE
+  // ==============================================================================
+  // We use React's useState hook to track three things:
+  // 1. Which page we're on (starts at 1)
+  // 2. All the answers the user has given so far (starts empty)
+  // 3. The generated YAML output (starts empty until they click Generate)
 
-  const [page, setPage] = useState(1)         // Which wizard step the user is on (1-based)
-  const [answers, setAnswers] = useState({})   // All user answers, keyed by question id
-  const [yamlOutput, setYamlOutput] = useState('') // The generated YAML string to display
+  const [page, setPage] = useState(1)
+  const [answers, setAnswers] = useState({})
+  const [yamlOutput, setYamlOutput] = useState('')
 
 
-  // ─── DERIVED VALUES ───────────────────────────────────────────────────────
-  // These are calculated fresh on every render — no need to store them in state.
+  // ==============================================================================
+  // COMPUTED VALUES
+  // ==============================================================================
+  // These values are recalculated every time the component renders.
+  // We don't store them in state because they're derived from existing state.
 
-  // Filter out steps whose showIf condition returns false, so we only show relevant steps
+  // Filter the full list of steps to only include ones that should be shown
+  // based on the user's answers. For example, if they didn't select Orchestration Cluster,
+  // we don't show the Orchestration Cluster database config step.
   const visibleSteps = wizardSteps.filter(step => {
     if (step.showIf) {
       return step.showIf(answers)
     }
-    return true // Steps without a showIf are always visible
+    return true // Steps without showIf are always visible
   })
 
   const totalPages = visibleSteps.length
-  const currentStepData = visibleSteps[page - 1] // page is 1-based, arrays are 0-based
+  
+  // Get the data for whichever step we're currently on
+  // Note: page is 1-based (human-friendly) but arrays are 0-based
+  const currentStepData = visibleSteps[page - 1]
 
 
-  // ─── HANDLERS ─────────────────────────────────────────────────────────────
+  // ==============================================================================
+  // EVENT HANDLERS
+  // ==============================================================================
 
-  // Called by QuestionRenderer whenever the user changes an answer.
-  // Spreads existing answers and overwrites just the changed question's value.
+  /**
+   * Saves an answer to state whenever the user interacts with an input.
+   * This gets called by QuestionRenderer components when values change.
+   */
   const saveAnswer = (questionId, value) => {
     setAnswers({
       ...answers,
       [questionId]: value
     })
 
-    // If the user changes their product selection, reset to page 1.
-    // This prevents them from being on a step that no longer exists.
+    // Special case: if they change their product selection, reset to page 1
+    // This prevents being stranded on a step that no longer exists
     if (questionId === 'products') {
       setPage(1)
     }
   }
 
-  // Move to the next step (won't go past the last step)
+  /**
+   * Navigate to the next step
+   */
   function next() {
     if (page < totalPages) {
       setPage(page + 1)
     }
   }
 
-  // Move to the previous step (won't go below step 1)
+  /**
+   * Navigate to the previous step
+   */
   function previous() {
     if (page > 1) {
       setPage(page - 1)
@@ -411,50 +511,117 @@ function App() {
   }
 
 
-  // ─── YAML GENERATOR ───────────────────────────────────────────────────────
-  // Builds a YAML configuration string from the collected answers.
-  // Each section is only added if the relevant product/database was selected.
+  // ==============================================================================
+  // YAML CONFIGURATION BUILDER
+  // ==============================================================================
+  /**
+   * Builds the final YAML configuration string based on all the answers.
+   * 
+   * How this works:
+   * - Start with an empty string
+   * - Check each possible configuration section
+   * - If the user answered those questions, add that section to the output
+   * - Use template strings to build properly indented YAML
+   * 
+   * The order matters here - we want global config at the top, then products,
+   * then environment variables for each product.
+   */
+const generateYaml = () => {
+  let config = ''
 
-  const generateYaml = () => {
-    let config = ''
+  const bothSelected = answers.products?.includes('Orchestration Cluster') && answers.products?.includes('Optimize')
 
-    // Global database config — only one of these will be added depending on
-    // which database the user selected for Zeebe
-    if (answers.zeebe_database === 'Elasticsearch') {
-      config += `global:
+  // Determine which database answers to use for Orchestration Cluster
+  const ocDatabase = bothSelected ? answers.shared_database : answers.orchestration_cluster_database
+  const ocEsUsername = bothSelected ? answers.shared_es_username : answers.orchestration_cluster_es_username
+  const ocEsPassword = bothSelected ? answers.shared_es_password : answers.orchestration_cluster_es_password
+  const ocEsProtocol = bothSelected ? answers.shared_es_protocol : answers.orchestration_cluster_es_protocol
+  const ocEsHost = bothSelected ? answers.shared_es_host : answers.orchestration_cluster_es_host
+  const ocOsUsername = bothSelected ? answers.shared_os_username : answers.orchestration_cluster_os_username
+  const ocOsPassword = bothSelected ? answers.shared_os_password : answers.orchestration_cluster_os_password
+  const ocOsProtocol = bothSelected ? answers.shared_os_protocol : answers.orchestration_cluster_os_protocol
+  const ocOsHost = bothSelected ? answers.shared_os_host : answers.orchestration_cluster_os_host
+
+  // Determine which database answers to use for Optimize
+  const optDatabase = bothSelected ? answers.shared_database : answers.optimize_database
+  const optEsUsername = bothSelected ? answers.shared_es_username : answers.optimize_es_username
+  const optEsPassword = bothSelected ? answers.shared_es_password : answers.optimize_es_password
+  const optEsProtocol = bothSelected ? answers.shared_es_protocol : answers.optimize_es_protocol
+  const optEsHost = bothSelected ? answers.shared_es_host : answers.optimize_es_host
+  const optOsUsername = bothSelected ? answers.shared_os_username : answers.optimize_os_username
+  const optOsPassword = bothSelected ? answers.shared_os_password : answers.optimize_os_password
+  const optOsProtocol = bothSelected ? answers.shared_os_protocol : answers.optimize_os_protocol
+  const optOsHost = bothSelected ? answers.shared_os_host : answers.optimize_os_host
+
+  // Global Elasticsearch block (driven by Orchestration Cluster selection)
+  if (answers.products?.includes('Orchestration Cluster') && ocDatabase === 'Elasticsearch') {
+    config += `global:
   elasticsearch:
     enabled: true
     external: true
     auth:
-      username: "${answers.zeebe_es_username}"
+      username: "${ocEsUsername}"
       secret:
-        password: "${answers.zeebe_es_password}"
+        password: "${ocEsPassword}"
     url:
-      protocol: "${answers.zeebe_es_protocol}"
-      host: "${answers.zeebe_es_host}"
+      protocol: "${ocEsProtocol}"
+      host: "${ocEsHost}"
       port: 9200
     clusterName: "elasticsearch"\n\n`
-    }
+  }
 
-    if (answers.zeebe_database === 'OpenSearch') {
-      config += `global:
+  // Global OpenSearch block (driven by Orchestration Cluster selection)
+  if (answers.products?.includes('Orchestration Cluster') && ocDatabase === 'OpenSearch') {
+    config += `global:
   opensearch:
     enabled: true
     external: true
     auth:
-      username: "${answers.zeebe_os_username}"
+      username: "${ocOsUsername}"
       secret:
-        password: "${answers.zeebe_os_password}"
+        password: "${ocOsPassword}"
     url:
-      protocol: "${answers.zeebe_os_protocol}"
-      host: "${answers.zeebe_os_host}"
+      protocol: "${ocOsProtocol}"
+      host: "${ocOsHost}"
       port: 9200
     clusterName: "opensearch"\n\n`
-    }
+  }
 
-    // Web Modeler database section (only if Web Modeler was selected and PostgreSQL chosen)
-    if (answers.products?.includes('Web Modeler') && answers.webmodeler_database === 'PostgreSQL') {
-      config += `webModeler:
+  // Optimize Elasticsearch block (only standalone)
+  if (answers.products?.includes('Optimize') && !bothSelected && optDatabase === 'Elasticsearch') {
+    config += `optimize:
+  elasticsearch:
+    enabled: true
+    external: true
+    auth:
+      username: "${optEsUsername}"
+      secret:
+        password: "${optEsPassword}"
+    url:
+      protocol: "${optEsProtocol}"
+      host: "${optEsHost}"
+      port: 9200\n\n`
+  }
+
+  // Optimize OpenSearch block (only standalone)
+  if (answers.products?.includes('Optimize') && !bothSelected && optDatabase === 'OpenSearch') {
+    config += `optimize:
+  opensearch:
+    enabled: true
+    external: true
+    auth:
+      username: "${optOsUsername}"
+      secret:
+        password: "${optOsPassword}"
+    url:
+      protocol: "${optOsProtocol}"
+      host: "${optOsHost}"
+      port: 9200\n\n`
+  }
+
+  // Web Modeler PostgreSQL config
+  if (answers.products?.includes('Web Modeler') && answers.webmodeler_database === 'PostgreSQL') {
+    config += `webModeler:
   restapi:
     externalDatabase:
       enabled: true
@@ -464,111 +631,98 @@ function App() {
       database: "web-modeler"
       user: "${answers.webmodeler_db_user}"
       password: "${answers.webmodeler_db_password}"\n\n`
-    }
-
-    // Helper pattern used for each product's env vars below:
-    // Only add the section if the array exists and has at least one entry.
-
-    if (answers.console_env_vars && answers.console_env_vars.length > 0) {
-      config += `console:\n  env:\n`
-      answers.console_env_vars.forEach(env => {
-        config += `    - name: ${env.name}\n      value: ${env.value}\n`
-      })
-      config += '\n'
-    }
-
-    if (answers.connectors_env_vars && answers.connectors_env_vars.length > 0) {
-      config += `connectors:\n  env:\n`
-      answers.connectors_env_vars.forEach(env => {
-        config += `    - name: ${env.name}\n      value: ${env.value}\n`
-      })
-      config += '\n'
-    }
-
-    if (answers.zeebe_env_vars && answers.zeebe_env_vars.length > 0) {
-      config += `orchestration:\n  env:\n`
-      answers.zeebe_env_vars.forEach(env => {
-        config += `    - name: ${env.name}\n      value: ${env.value}\n`
-      })
-      config += '\n'
-    }
-
-    if (answers.optimize_env_vars && answers.optimize_env_vars.length > 0) {
-      config += `optimize:\n  env:\n`
-      answers.optimize_env_vars.forEach(env => {
-        config += `    - name: ${env.name}\n      value: ${env.value}\n`
-      })
-      config += '\n'
-    }
-
-    if (answers.identity_env_vars && answers.identity_env_vars.length > 0) {
-      config += `identity:\n  env:\n`
-      answers.identity_env_vars.forEach(env => {
-        config += `    - name: ${env.name}\n      value: ${env.value}\n`
-      })
-      config += '\n'
-    }
-
-    // Web Modeler has three sub-sections (restApi, webApp, websocket).
-    // We use a flag to avoid writing the 'webModeler:' parent key more than once.
-    let webModelerEnvAdded = false
-
-    if (answers.webmodeler_restapi_env_vars && answers.webmodeler_restapi_env_vars.length > 0) {
-      if (!webModelerEnvAdded) {
-        config += `webModeler:\n`
-        webModelerEnvAdded = true
-      }
-      config += `  restApi:\n    env:\n`
-      answers.webmodeler_restapi_env_vars.forEach(env => {
-        config += `      - name: ${env.name}\n        value: ${env.value}\n`
-      })
-    }
-
-    if (answers.webmodeler_webapp_env_vars && answers.webmodeler_webapp_env_vars.length > 0) {
-      if (!webModelerEnvAdded) {
-        config += `webModeler:\n`
-        webModelerEnvAdded = true
-      }
-      config += `  webApp:\n    env:\n`
-      answers.webmodeler_webapp_env_vars.forEach(env => {
-        config += `      - name: ${env.name}\n        value: ${env.value}\n`
-      })
-    }
-
-    if (answers.webmodeler_websocket_env_vars && answers.webmodeler_websocket_env_vars.length > 0) {
-      if (!webModelerEnvAdded) {
-        config += `webModeler:\n`
-        webModelerEnvAdded = true
-      }
-      config += `  websocket:\n    env:\n`
-      answers.webmodeler_websocket_env_vars.forEach(env => {
-        config += `      - name: ${env.name}\n        value: ${env.value}\n`
-      })
-    }
-
-    // If nothing was configured, show a fallback message instead of blank output
-    setYamlOutput(config || 'No configuration generated yet...')
   }
 
+  if (answers.console_env_vars && answers.console_env_vars.length > 0) {
+    config += `console:\n  env:\n`
+    answers.console_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
 
-  // ─── RENDER ───────────────────────────────────────────────────────────────
+  if (answers.connectors_env_vars && answers.connectors_env_vars.length > 0) {
+    config += `connectors:\n  env:\n`
+    answers.connectors_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  if (answers.orchestration_cluster_env_vars && answers.orchestration_cluster_env_vars.length > 0) {
+    config += `orchestration:\n  env:\n`
+    answers.orchestration_cluster_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  if (answers.optimize_env_vars && answers.optimize_env_vars.length > 0) {
+    config += `optimize:\n  env:\n`
+    answers.optimize_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  if (answers.management_identity_env_vars && answers.management_identity_env_vars.length > 0) {
+    config += `Management Identity:\n  env:\n`
+    answers.management_identity_env_vars.forEach(env => {
+      config += `    - name: ${env.name}\n      value: ${env.value}\n`
+    })
+    config += '\n'
+  }
+
+  let webModelerEnvAdded = false
+
+  if (answers.webmodeler_restapi_env_vars && answers.webmodeler_restapi_env_vars.length > 0) {
+    if (!webModelerEnvAdded) { config += `webModeler:\n`; webModelerEnvAdded = true }
+    config += `  restApi:\n    env:\n`
+    answers.webmodeler_restapi_env_vars.forEach(env => {
+      config += `      - name: ${env.name}\n        value: ${env.value}\n`
+    })
+  }
+
+  if (answers.webmodeler_webapp_env_vars && answers.webmodeler_webapp_env_vars.length > 0) {
+    if (!webModelerEnvAdded) { config += `webModeler:\n`; webModelerEnvAdded = true }
+    config += `  webApp:\n    env:\n`
+    answers.webmodeler_webapp_env_vars.forEach(env => {
+      config += `      - name: ${env.name}\n        value: ${env.value}\n`
+    })
+  }
+
+  if (answers.webmodeler_websocket_env_vars && answers.webmodeler_websocket_env_vars.length > 0) {
+    if (!webModelerEnvAdded) { config += `webModeler:\n`; webModelerEnvAdded = true }
+    config += `  websocket:\n    env:\n`
+    answers.webmodeler_websocket_env_vars.forEach(env => {
+      config += `      - name: ${env.name}\n        value: ${env.value}\n`
+    })
+  }
+
+  setYamlOutput(config || 'No configuration generated yet...')
+}
+
+
+  // ==============================================================================
+  // RENDER
+  // ==============================================================================
   return (
     <main className="config-app">
 
-      {/* Step counter shown in the breadcrumb pill at the top */}
-      <header className='bread-crumb'>
+      {/* Progress indicator at the top */}
+      <header className='step-indicator'>
         <p>Step {page} Of {totalPages}</p>
       </header>
 
-      {/* Main content area — renders the current step's title and questions */}
+      {/* Main wizard content area */}
       <section className="wizard-content">
         <h2>{currentStepData.title}</h2>
 
         {currentStepData.questions.map(q => {
-          // If a question has a showIf condition that returns false, skip rendering it
+          // Skip questions that have a showIf condition that returns false
           if (q.showIf && !q.showIf(answers)) return null
 
-          // QuestionRenderer decides which input type to render based on q.type
+          // Render the appropriate input type for this question
           return (
             <QuestionRenderer
               key={q.id}
@@ -580,23 +734,22 @@ function App() {
         })}
       </section>
 
-      {/* Fixed panel at the bottom-left showing the live YAML output */}
+      {/* Live YAML output panel (fixed to bottom-left corner) */}
       <div className='output'>
         <pre>{yamlOutput || 'Config will appear here...'}</pre>
       </div>
 
-      {/* Back/Next navigation buttons, fixed vertically centred on the sides */}
+      {/* Navigation buttons (fixed to sides, vertically centered) */}
       <nav className='app-navigation'>
         <button className="nav-button back-button" onClick={previous}>
           <i className="fa-solid fa-arrow-left arrow"></i>Back
         </button>
-        {/* disabled when on the last step so the user can't go past the end */}
         <button className="nav-button next-button" onClick={next} disabled={page === totalPages}>
           Next<i className="fa-solid fa-arrow-right"></i>
         </button>
       </nav>
 
-      {/* Fixed Generate button — always visible, triggers YAML generation */}
+      {/* Generate button (fixed to bottom-right corner) */}
       <button className="generate-button" onClick={generateYaml}>Generate</button>
 
     </main>
@@ -604,44 +757,63 @@ function App() {
 }
 
 
-// ─── ENVIRONMENT VARIABLES MANAGER ──────────────────────────────────────────
-// A self-contained component for managing a list of name/value env var pairs.
-// Props:
-//   - productId: the question id (not used in rendering, but available if needed)
-//   - value: the current array of env var objects [{ name, value }, ...]
-//   - onChange: callback to pass the updated array back up to App's state
-
+// ==============================================================================
+// ENVIRONMENT VARIABLES MANAGER
+// ==============================================================================
+/**
+ * A mini-component for managing environment variables for a product.
+ * Users can add, edit, and delete name/value pairs.
+ * 
+ * This component maintains its own local state for the list of env vars,
+ * but syncs changes back to the parent (App) via the onChange callback.
+ * 
+ * How it works:
+ * - User fills in name and value, clicks "Done" → adds to list
+ * - User clicks "Edit" on an existing var → populates form for editing
+ * - User clicks "Update" → saves changes
+ * - User clicks "Delete" → removes from list
+ * - User clicks "New" → clears form to add another
+ */
 function EnvironmentVariablesManager({ productId, value, onChange }) {
 
-  // Local copy of the env var list — kept in sync with the parent via onChange
+  // Local state - this component manages its own list of env vars
   const [envVars, setEnvVars] = useState(value || [])
-
-  // Tracks which item is being edited (by index), or null if we're adding a new one
+  
+  // Track which item we're currently editing (null if adding new)
   const [editingIndex, setEditingIndex] = useState(null)
-
-  // Controlled input state for the name/value fields in the form
+  
+  // Current values in the input fields
   const [currentName, setCurrentName] = useState('')
   const [currentValue, setCurrentValue] = useState('')
 
-  // Add a new env var from the current form values
+  /**
+   * Add a new environment variable to the list
+   */
   const handleAdd = () => {
-    if (!currentName || !currentValue) return // Don't add if either field is empty
+    // Don't add if either field is empty
+    if (!currentName || !currentValue) return
 
     const newEnvVars = [...envVars, { name: currentName, value: currentValue }]
     setEnvVars(newEnvVars)
-    onChange(newEnvVars) // Notify parent so it gets saved into App's answers state
+    onChange(newEnvVars) // Sync back to parent
+    
+    // Clear the form
     setCurrentName('')
     setCurrentValue('')
   }
 
-  // Populate the form with an existing env var's values so the user can edit it
+  /**
+   * Load an existing env var into the form for editing
+   */
   const handleEdit = (index) => {
     setEditingIndex(index)
     setCurrentName(envVars[index].name)
     setCurrentValue(envVars[index].value)
   }
 
-  // Save the edited values back into the list at the same index
+  /**
+   * Save changes to an existing env var
+   */
   const handleUpdate = () => {
     if (editingIndex === null) return
 
@@ -650,20 +822,24 @@ function EnvironmentVariablesManager({ productId, value, onChange }) {
     setEnvVars(newEnvVars)
     onChange(newEnvVars)
 
-    // Reset to "add new" mode
+    // Exit edit mode and clear form
     setEditingIndex(null)
     setCurrentName('')
     setCurrentValue('')
   }
 
-  // Remove an env var by filtering it out by index
+  /**
+   * Remove an env var from the list
+   */
   const handleDelete = (index) => {
     const newEnvVars = envVars.filter((_, i) => i !== index)
     setEnvVars(newEnvVars)
     onChange(newEnvVars)
   }
 
-  // Cancel editing and clear the form, ready to add a new entry
+  /**
+   * Clear the form and exit edit mode (ready to add new)
+   */
   const handleNew = () => {
     setEditingIndex(null)
     setCurrentName('')
@@ -673,7 +849,7 @@ function EnvironmentVariablesManager({ productId, value, onChange }) {
   return (
     <div className="env-vars-manager">
 
-      {/* List of already-added env vars with Edit and Delete buttons */}
+      {/* List of existing environment variables */}
       <div className="env-vars-list">
         {envVars.map((env, index) => (
           <div key={index} className="env-var-item">
@@ -686,7 +862,7 @@ function EnvironmentVariablesManager({ productId, value, onChange }) {
         ))}
       </div>
 
-      {/* Add / Edit form — the button label changes based on whether we're editing */}
+      {/* Add/Edit form */}
       <div className="env-var-form">
         <input
           type="text"
@@ -702,13 +878,12 @@ function EnvironmentVariablesManager({ productId, value, onChange }) {
         />
 
         <div className="env-form-buttons">
-          {/* Show 'Done' (add) when not editing, 'Update' when editing an existing entry */}
+          {/* Show different button depending on whether we're adding or editing */}
           {editingIndex === null ? (
             <button onClick={handleAdd} className="done-btn">Done</button>
           ) : (
             <button onClick={handleUpdate} className="update-btn">Update</button>
           )}
-          {/* New clears the form and exits edit mode */}
           <button onClick={handleNew} className="new-btn">New</button>
         </div>
       </div>
@@ -718,17 +893,25 @@ function EnvironmentVariablesManager({ productId, value, onChange }) {
 }
 
 
-// ─── QUESTION RENDERER ────────────────────────────────────────────────────────
-// A pure presentational component — it doesn't manage any state itself.
-// It receives a question object and renders the appropriate input type.
-// Props:
-//   - question: the question config object from wizardSteps
-//   - value: the current answer value from App's answers state
-//   - onChange: callback to pass the new value up to App
-
+// ==============================================================================
+// QUESTION RENDERER
+// ==============================================================================
+/**
+ * Renders the appropriate input type for a question.
+ * 
+ * This is a "dumb" component - it doesn't have any of its own state.
+ * It just displays what it's told to display and reports changes back up
+ * to the parent via the onChange callback.
+ * 
+ * Supported question types:
+ * - radio: single selection from options
+ * - checkbox: multiple selections from options
+ * - text/password: single-line text input
+ * - env_vars: special component for environment variables
+ */
 function QuestionRenderer({ question, value, onChange }) {
 
-  // Radio buttons — user picks exactly one option
+  // Radio buttons - user selects exactly one option
   if (question.type === 'radio') {
     return (
       <div className="question-wrapper">
@@ -738,7 +921,7 @@ function QuestionRenderer({ question, value, onChange }) {
             <label key={opt}>
               <input
                 type="radio"
-                name={question.id}  // Grouping by name ensures only one can be selected
+                name={question.id}  // Groups radio buttons so only one can be selected
                 value={opt}
                 checked={value === opt}
                 onChange={(e) => onChange(e.target.value)}
@@ -751,7 +934,7 @@ function QuestionRenderer({ question, value, onChange }) {
     )
   }
 
-  // Checkboxes — user can pick multiple options
+  // Checkboxes - user can select multiple options
   if (question.type === 'checkbox') {
     return (
       <div className="question-wrapper">
@@ -766,10 +949,10 @@ function QuestionRenderer({ question, value, onChange }) {
                 onChange={(e) => {
                   const newValue = value || []
                   if (e.target.checked) {
-                    // Add this option to the array
+                    // Add to array
                     onChange([...newValue, opt])
                   } else {
-                    // Remove this option from the array
+                    // Remove from array
                     onChange(newValue.filter(v => v !== opt))
                   }
                 }}
@@ -782,13 +965,13 @@ function QuestionRenderer({ question, value, onChange }) {
     )
   }
 
-  // Text or password input — single line free-text entry
+  // Text or password input - single line of text
   if (question.type === 'text' || question.type === 'password') {
     return (
       <div className="question-wrapper text-input">
         <label>{question.label}</label>
         <input
-          type={question.type} // Passes 'text' or 'password' directly to the input
+          type={question.type}
           value={value || ''}
           placeholder={question.placeholder || ''}
           onChange={(e) => onChange(e.target.value)}
@@ -797,7 +980,7 @@ function QuestionRenderer({ question, value, onChange }) {
     )
   }
 
-  // Environment variables — renders the EnvironmentVariablesManager component
+  // Environment variables - use the special manager component
   if (question.type === 'env_vars') {
     return (
       <div className="question-wrapper">
