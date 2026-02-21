@@ -356,7 +356,7 @@ function App() {
       questions: [
         {
           id: 'orchestration_cluster_env_vars',
-          label: 'Add environment variables for Orchestration Cluster (optional)',
+          label: 'Add environment variables for Orchestration Cluster',
           type: 'env_vars'
         }
       ]
@@ -368,7 +368,7 @@ function App() {
       questions: [
         {
           id: 'connectors_env_vars',
-          label: 'Add environment variables for Connectors (optional)',
+          label: 'Add environment variables for Connectors',
           type: 'env_vars'
         }
       ]
@@ -380,7 +380,7 @@ function App() {
       questions: [
         {
           id: 'optimize_env_vars',
-          label: 'Add environment variables for Optimize (optional)',
+          label: 'Add environment variables for Optimize',
           type: 'env_vars'
         }
       ]
@@ -392,7 +392,7 @@ function App() {
       questions: [
         {
           id: 'management_identity_env_vars',
-          label: 'Add environment variables for Management Identity (optional)',
+          label: 'Add environment variables for Management Identity',
           type: 'env_vars'
         }
       ]
@@ -405,17 +405,17 @@ function App() {
       questions: [
         {
           id: 'webmodeler_restapi_env_vars',
-          label: 'REST API Environment Variables (optional)',
+          label: 'REST API Environment Variables',
           type: 'env_vars'
         },
         {
           id: 'webmodeler_webapp_env_vars',
-          label: 'Web App Environment Variables (optional)',
+          label: 'Web App Environment Variables',
           type: 'env_vars'
         },
         {
           id: 'webmodeler_websocket_env_vars',
-          label: 'WebSocket Environment Variables (optional)',
+          label: 'WebSocket Environment Variables',
           type: 'env_vars'
         }
       ]
@@ -427,7 +427,7 @@ function App() {
       questions: [
         {
           id: 'console_env_vars',
-          label: 'Add environment variables for Console (optional)',
+          label: 'Add environment variables for Console',
           type: 'env_vars'
         }
       ]
@@ -884,7 +884,7 @@ function EnvironmentVariablesManager({ productId, value, onChange }) {
           ) : (
             <button onClick={handleUpdate} className="update-btn">Update</button>
           )}
-          <button onClick={handleNew} className="new-btn">New</button>
+          <button onClick={handleNew} className="new-btn">Clear</button>
         </div>
       </div>
 

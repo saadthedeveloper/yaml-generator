@@ -147,8 +147,10 @@
   align-items: center;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
-  background: #f5f5f5;
+  background: #171717;
   border-radius: 4px;
+  color: white;
+  border: 1px solid gray;
 }
 
 .env-var-actions {
