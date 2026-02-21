@@ -31,37 +31,6 @@ The Camunda 8 Configuration Wizard simplifies the process of configuring Camunda
 - **Saves Time**: No need to reference documentation repeatedly or search for configuration examples
 - **Dynamic Configuration**: Only shows relevant configuration steps based on selected products
 
-
-## Features
-
-### Product Selection
-Support for all major Camunda 8 components:
-- Orchestration Cluster
-- Connectors
-- Optimize
-- Management Identity
-- Web Modeler
-- Console
-
-### Database Configuration
-- **Elasticsearch**: External Elasticsearch cluster configuration
-- **OpenSearch**: External OpenSearch cluster configuration
-- **PostgreSQL**: Database configuration for Identity and Web Modeler
-
-### Environment Variables Management
-- Add unlimited environment variables per product
-- Edit and delete existing variables
-- Support for Web Modeler sub-services:
-  - REST API
-  - Web App
-  - WebSocket
-
-### User Experience
-- Conditional navigation - only relevant steps are shown
-- Progress indicator showing current step
-- Back/Next navigation with validation
-- Fixed "Generate" button for instant config generation
-
 ## Prerequisites
 
 - **Node.js**: v16.0.0 or higher
