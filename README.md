@@ -23,23 +23,23 @@ An interactive web-based wizard for generating production-ready YAML configurati
 
 ## About
 
-The Camunda 8 Configuration Wizard simplifies the process of configuring Camunda 8 Self-Managed installations by providing an intuitive step-by-step interface. Instead of manually editing YAML files, users can select their required components, configure databases, and set environment variables through a guided workflow.
+The Camunda 8 Configuration Wizard simplifies the process of configuring Camunda 8 Self-Managed installations by providing an intuitive step-by-step interface.
 
 ### Why This Tool?
 
 - **Reduces Configuration Errors**: Guided form inputs with validation prevent common YAML syntax mistakes
 - **Saves Time**: No need to reference documentation repeatedly or search for configuration examples
 - **Dynamic Configuration**: Only shows relevant configuration steps based on selected products
-- **Live Preview**: See your YAML configuration update in real-time as you make selections
+
 
 ## Features
 
 ### Product Selection
 Support for all major Camunda 8 components:
-- Zeebe Broker and Gateway (including Operate & Tasklist)
+- Orchestration Cluster
 - Connectors
 - Optimize
-- Identity
+- Management Identity
 - Web Modeler
 - Console
 
@@ -60,7 +60,6 @@ Support for all major Camunda 8 components:
 - Conditional navigation - only relevant steps are shown
 - Progress indicator showing current step
 - Back/Next navigation with validation
-- Live YAML output preview
 - Fixed "Generate" button for instant config generation
 
 ## Prerequisites
@@ -84,21 +83,11 @@ Using npm:
 npm install
 ```
 
-Using yarn:
-```bash
-yarn install
-```
-
 ### Start Development Server
 
 Using npm:
 ```bash
 npm run dev
-```
-
-Using yarn:
-```bash
-yarn dev
 ```
 
 The application will start at `http://localhost:5173`
