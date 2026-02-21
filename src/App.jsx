@@ -344,7 +344,7 @@ function App() {
     // ==============================================================================
     // ENVIRONMENT VARIABLES SECTION
     // ==============================================================================
-    // Each product gets its own step for optional environment variables.
+    // Each product gets its own step for  environment variables.
     // Users can add as many name/value pairs as they need, or skip entirely.
     // Web Modeler is special - it has three sub-services (restApi, webApp, websocket)
     // so we ask for env vars separately for each.

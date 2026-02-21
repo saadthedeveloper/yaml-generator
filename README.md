@@ -9,17 +9,10 @@ An interactive web-based wizard for generating production-ready YAML configurati
 ## Table of Contents
 
 - [About](#about)
-- [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Configuration Output](#configuration-output)
-- [Project Structure](#project-structure)
-- [Development](#development)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Support](#support)
+
+
 
 ## About
 
@@ -41,7 +34,7 @@ The Camunda 8 Configuration Wizard simplifies the process of configuring Camunda
 
 ### Clone the Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/camunda-community-hub/cphc-values-builder
 cd camunda-config-wizard
 ```
 
@@ -61,4 +54,3 @@ npm run dev
 
 The application will start at `http://localhost:5173`
 
-**Built with ❤️ for the Camunda Community**
