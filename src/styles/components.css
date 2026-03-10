@@ -473,6 +473,11 @@
 }
 
 /* ─── Env Vars Editor ──────────────────────────────────────────────────────── */
+/*
+ * Dynamic list of name/value pairs rendered per product.
+ * The grid layout aligns name input, value input, and remove button in a row.
+ * On mobile, inputs stack vertically with the remove button spanning both rows.
+ */
 
 .env-vars-editor {
   display: flex;
@@ -497,7 +502,6 @@
   font-size: 12px;
   outline: none;
   transition: border-color 0.2s;
-  box-sizing: border-box;
 }
 
 .env-var-input::placeholder {
@@ -589,6 +593,11 @@
 }
 
 /* ─── Field Tooltip ────────────────────────────────────────────────────────── */
+/*
+ * Hover tooltip shown next to field labels. Uses position: fixed so it is
+ * never clipped by parent overflow. Position is calculated in JS (Tooltip
+ * component in App.jsx) based on the icon's getBoundingClientRect().
+ */
 
 .field-label-row {
   display: flex;
@@ -627,6 +636,7 @@
 }
 
 .tooltip-box {
+  /* visibility is controlled via inline styles in the Tooltip component */
   display: none;
   position: fixed;
   background-color: var(--card-bg);
