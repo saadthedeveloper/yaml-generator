@@ -85,6 +85,19 @@ function applyProductFlags(helmValues, answers) {
   // ── Console ───────────────────────────────────────────────────────────────
   helmValues = setNestedValue(helmValues, "console.enabled", selected.includes("console"))
 
+  // ── Cluster type flags ────────────────────────────────────────────────────
+  // Applied automatically based on the selected Kubernetes cluster type.
+  // Only flags with real schema paths are set - GKE, AKS, IBM, and Bare Metal
+  // have no cluster-specific Helm values so no flags are needed for them.
+  if (answers.clusterType === 'AWS EKS') {
+    // Enable AWS IRSA (IAM Roles for Service Accounts) for OpenSearch
+    helmValues = setNestedValue(helmValues, 'global.opensearch.aws.enabled', true)
+  }
+  if (answers.clusterType === 'OpenShift') {
+    // Force security context adaptation for OpenShift restricted-v2 SCC
+    helmValues = setNestedValue(helmValues, 'global.compatibility.openshift.adaptSecurityContext', 'force')
+  }
+
   // ── Database type flags ────────────────────────────────────────────────────
   // Only relevant if orchestration or optimize is selected
   const needsSearchDB = selected.includes("orchestration") || selected.includes("optimize")

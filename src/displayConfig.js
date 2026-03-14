@@ -49,6 +49,28 @@ export const displayConfig = {
 
   sections: [
 
+    // ── Cluster Type ───────────────────────────────────────────────────────────
+    // Shown as soon as any product is selected.
+    // OpenShift affects security contexts for all products.
+    // AWS EKS affects OpenSearch config.
+    // GKE, AKS, IBM, and Bare Metal produce no extra flags but are listed
+    // for completeness so the user isn't confused by a missing option.
+    {
+      id: 'clusterType',
+      title: 'Kubernetes Cluster Type',
+      showIf: (answers) => answers.products.length > 0,
+      fields: [
+        {
+          id: 'clusterType',
+          path: null,
+          label: 'Select Cluster Type',
+          type: 'radio',
+          options: ['AWS EKS', 'OpenShift'],
+          required: false,
+        }
+      ]
+    },
+
     // ── Database Type ──────────────────────────────────────────────────────────
     // Only shown if orchestration or optimize is selected
     {
